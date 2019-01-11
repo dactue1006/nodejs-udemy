@@ -1,8 +1,29 @@
+const debug = require('debug')('app:startup');
+const config = require('config');
+const helmet = require('helmet');
+const morgan = require('morgan');
 const Joi = require('joi');
 const express = require('express');
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views', './views'); // default
+
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`Environment ${app.get('env')}`);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(helmet());
+
+console.log("your enviroment name", config.get('name'));
+console.log("Your mail name", config.get('mail.host'));
+console.log("Your mail password", config.get("mail.password"));
+
+if (app.get('env')==='development') {
+  app.use(morgan('tiny'));
+  debug("morgan is enabled...");
+}
 
 const courses = [
   { id: '1', name: 'java'},
@@ -10,7 +31,10 @@ const courses = [
   { id: '3', name: 'Javascript'}
 ]
 app.get('/', (req, res)=> {
-  res.send([1, 2, 3]);
+  res.render('index', {
+    title: 'con cac',
+    message: 'hello'
+  })
 })
 app.get('/api/courses', (req, res)=> {
   res.send(courses);
