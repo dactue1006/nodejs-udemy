@@ -1,34 +1,26 @@
-const Joi = require('joi');
-Joi.objectId = require('joi-objectid')(Joi);
-const config = require('config');
-const mongoose = require('mongoose');
-const genres = require('./routes/genres');
-const customers = require('./routes/customers');
-const movies = require('./routes/movies');
-const rentals = require('./routes/rentals');
-const users = require('./routes/users');
-const auth = require('./routes/auth');
+const morgan = require('morgan');
+const winston = require('winston');
 const express = require('express');
 const app = express();
 
-if (!config.get('jwtPrivateKey')) {
-  console.error('FATAL ERROR: jwtPrivateKey is not defined');
-  process.exit();
-}
 
-mongoose.connect('mongodb://localhost/vidly', { 
-    useNewUrlParser: true,
-    useCreateIndex: true
-  })
-  .then(() => console.log('Connected to MongoDB...'))
-  .catch(err => console.error('Could not connect to MongoDB...'));
+// config joi validation
+require('./startup/validation')();
+// error handling and logging
+require('./startup/logging')();
 
+// config private key
+require('./startup/config')();
+
+// use module
 app.use(express.json());
-app.use('/api/genres', genres);
-app.use('/api/customers', customers);
-app.use('/api/movies', movies);
-app.use('/api/rentals', rentals);
-app.use('/api/users', users);
-app.use('/api/auth', auth);
+app.use(morgan('dev'));
+
+// routes
+require('./startup/routes')(app);
+
+// database
+require('./startup/db')();
+
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}...`));
+app.listen(port, () => winston.info(`Listening on port ${port}...`));
