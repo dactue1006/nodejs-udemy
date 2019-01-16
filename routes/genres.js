@@ -7,7 +7,6 @@ const router = express.Router();
 
 
 router.get('/', async (req, res) => {
-  throw new Error('Fatal error: something failed');
   const genres = await Genre.find().sort('name');
   res.send(genres);
 });
