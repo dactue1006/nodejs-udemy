@@ -18,6 +18,7 @@ app.use(morgan('dev'));
 
 // routes
 require('./startup/routes')(app);
+require('./startup/prod')(app);
 
 // database
 require('./startup/db')();

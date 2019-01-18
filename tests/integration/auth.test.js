@@ -6,7 +6,7 @@ let server;
 describe('/api/auth', () => {
   beforeEach(() => { server = require('../../')})
   afterEach( async () => {
-    server.close();
+    await server.close();
     await Genre.deleteMany({})
   })
 
